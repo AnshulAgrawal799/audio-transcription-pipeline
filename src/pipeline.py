@@ -19,16 +19,10 @@ from datetime import datetime
 from audio_processor import AudioProcessor
 from transcription import TranscriptionEngine
 from api_client import GeminiAPIClient
+from translation import TranslationEngine
+from tts import TTSEngine
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('pipeline.log'),
-        logging.StreamHandler()
-    ]
-)
+# Remove logging.basicConfig here; logging is configured in main.py
 logger = logging.getLogger(__name__)
 
 
@@ -50,6 +44,8 @@ class AudioTranscriptionPipeline:
         self.audio_processor = AudioProcessor(input_dir, output_dir)
         self.transcription_engine = TranscriptionEngine(output_dir=output_dir)
         self.api_client = GeminiAPIClient(output_dir=output_dir)
+        self.translation_engine = TranslationEngine(output_dir=output_dir)
+        self.tts_engine = TTSEngine(output_dir=output_dir)
         
         # Pipeline state
         self.current_file = None
@@ -206,6 +202,88 @@ class AudioTranscriptionPipeline:
             }
             return None
     
+    def translation_step(self, english_text: str) -> Optional[Dict[str, Any]]:
+        """
+        Process English text through the translation step.
+        
+        Args:
+            english_text: English text to translate to Tamil
+            
+        Returns:
+            Optional[Dict[str, Any]]: Translation result
+        """
+        logger.info(f"Step 4: Translation - {len(english_text)} characters")
+        
+        try:
+            # Use the current file name for unique output naming
+            base_filename = Path(self.current_file).stem if self.current_file else "translation"
+            translation_result = self.translation_engine.process_text(english_text, base_filename)
+            if translation_result:
+                logger.info("Translation completed successfully")
+                self.step_results['translation'] = {
+                    'status': 'success',
+                    'original_length': len(translation_result.get('original_text', '')),
+                    'translated_length': len(translation_result.get('translated_text', ''))
+                }
+                return translation_result
+            else:
+                logger.error("Translation failed")
+                self.step_results['translation'] = {
+                    'status': 'failed',
+                    'input_length': len(english_text)
+                }
+                return None
+                
+        except Exception as e:
+            logger.error(f"Translation error: {e}")
+            self.step_results['translation'] = {
+                'status': 'error',
+                'error': str(e),
+                'input_length': len(english_text)
+            }
+            return None
+    
+    def tts_step(self, tamil_text: str) -> Optional[Dict[str, Any]]:
+        """
+        Process Tamil text through the TTS step.
+        
+        Args:
+            tamil_text: Tamil text to convert to speech
+            
+        Returns:
+            Optional[Dict[str, Any]]: TTS result
+        """
+        logger.info(f"Step 5: Text-to-Speech - {len(tamil_text)} characters")
+        
+        try:
+            # Use the current file name for unique output naming
+            base_filename = Path(self.current_file).stem if self.current_file else "tamil_speech"
+            tts_result = self.tts_engine.process_text(tamil_text, base_filename)
+            if tts_result:
+                logger.info("TTS completed successfully")
+                self.step_results['tts'] = {
+                    'status': 'success',
+                    'audio_file_path': tts_result.get('audio_file_path', ''),
+                    'text_length': len(tts_result.get('original_text', ''))
+                }
+                return tts_result
+            else:
+                logger.error("TTS failed")
+                self.step_results['tts'] = {
+                    'status': 'failed',
+                    'input_length': len(tamil_text)
+                }
+                return None
+                
+        except Exception as e:
+            logger.error(f"TTS error: {e}")
+            self.step_results['tts'] = {
+                'status': 'error',
+                'error': str(e),
+                'input_length': len(tamil_text)
+            }
+            return None
+    
     def save_pipeline_summary(self) -> bool:
         """
         Save pipeline execution summary with unique filename.
@@ -287,6 +365,20 @@ class AudioTranscriptionPipeline:
                 logger.error("Pipeline failed at API processing step")
                 return False
             
+            # Step 4: Translation (English to Tamil)
+            english_text = api_response.get('generated_text', transcription_text)
+            translation_result = self.translation_step(english_text)
+            if not translation_result:
+                logger.error("Pipeline failed at translation step")
+                return False
+            
+            # Step 5: Text-to-Speech (Tamil text to audio)
+            tamil_text = translation_result.get('translated_text', '')
+            tts_result = self.tts_step(tamil_text)
+            if not tts_result:
+                logger.error("Pipeline failed at TTS step")
+                return False
+            
             # Save pipeline summary
             self.save_pipeline_summary()
             
@@ -338,4 +430,4 @@ class AudioTranscriptionPipeline:
         return results
 
 
-# Test function removed - use main.py for testing 
+# Test function removed - use main.py for testing

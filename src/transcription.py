@@ -9,12 +9,12 @@ Handles Tamil audio transcription to English using OpenAI Whisper:
 - Provides confidence scores for transcription
 """
 
-import os
 import logging
 import whisper
 from pathlib import Path
 from typing import Optional, Dict, Any
 import json
+from constants import TRANSCRIPTION_TXT_PATTERN, TRANSCRIPTION_JSON_PATTERN
 
 # Get logger for this module
 logger = logging.getLogger(__name__)
@@ -133,15 +133,17 @@ class TranscriptionEngine:
             audio_path = Path(transcription_result.get('audio_path', ''))
             audio_name = audio_path.stem if audio_path.exists() else base_filename
             
-            # Save plain text transcription
-            txt_filename = f"{audio_name}_transcription.txt"
+            txt_filename = TRANSCRIPTION_TXT_PATTERN.format(audio_name=audio_name)
             output_path = self.output_dir / txt_filename
+            
+            json_filename = TRANSCRIPTION_JSON_PATTERN.format(audio_name=audio_name)
+            json_path = self.output_dir / json_filename
+            
+            # Save plain text transcription
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(transcription_result['text'])
             
             # Save detailed JSON result
-            json_filename = f"{audio_name}_transcription_detailed.json"
-            json_path = self.output_dir / json_filename
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(transcription_result, f, indent=2, ensure_ascii=False)
             
@@ -224,4 +226,4 @@ class TranscriptionEngine:
         return transcription_result
 
 
-# Test function removed - use main.py for testing 
+# Test function removed - use main.py for testing

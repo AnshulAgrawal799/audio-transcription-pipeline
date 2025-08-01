@@ -15,7 +15,26 @@ from pathlib import Path
 # Add src directory to Python path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from pipeline import AudioTranscriptionPipeline
+from src.pipeline import AudioTranscriptionPipeline
+
+# Import output file patterns from a central constants module
+try:
+    from src.constants import OUTPUT_FILE_PATTERNS
+except ImportError:
+    # Fallback if constants.py does not exist yet
+    OUTPUT_FILE_PATTERNS = [
+        "{audio_name}_converted.wav (converted audio)",
+        "{audio_name}_transcription.txt (plain text transcription)",
+        "{audio_name}_transcription_detailed.json (detailed transcription data)",
+        "{audio_name}_api_response_YYYYMMDD_HHMMSS.json (Gemini API response)",
+        "{audio_name}_api_response_YYYYMMDD_HHMMSS.txt (API response text)",
+        "{audio_name}_translation.txt (Tamil translation)",
+        "{audio_name}_translation_detailed.json (detailed translation data)",
+        "{audio_name}_tamil_speech_YYYYMMDD_HHMMSS.mp3 (Tamil audio output)",
+        "{audio_name}_tamil_speech_metadata.json (TTS metadata)",
+        "{audio_name}_pipeline_summary.json (execution summary)",
+        "pipeline.log (detailed execution log)"
+    ]
 
 
 def setup_logging(verbose: bool = False):
@@ -83,12 +102,6 @@ Examples:
     setup_logging(args.verbose)
     logger = logging.getLogger(__name__)
     
-    # Print welcome message
-    print("🎵 Audio Transcription & Translation Pipeline")
-    print("=" * 50)
-    print("Processing Tamil audio files to English text with Gemini API integration")
-    print()
-    
     try:
         # Initialize pipeline
         pipeline = AudioTranscriptionPipeline(
@@ -98,19 +111,13 @@ Examples:
         
         # Process files
         if args.file:
-            # Process specific file
             logger.info(f"Processing specific file: {args.file}")
-            
-            # Check if file exists
             file_path = Path(args.input_dir) / args.file
             if not file_path.exists():
                 logger.error(f"File not found: {file_path}")
                 print(f"❌ Error: File not found - {file_path}")
                 return 1
-            
-            # Process single file
             success = pipeline.process_single_file(args.file)
-            
             if success:
                 print(f"✅ Successfully processed: {args.file}")
                 print(f"📁 Results saved in: {args.output_dir}")
@@ -118,12 +125,8 @@ Examples:
             else:
                 print(f"❌ Failed to process: {args.file}")
                 return 1
-        
         else:
-            # Process all files
             logger.info("Processing all audio files in input directory")
-            
-            # Validate environment first
             if not pipeline.validate_environment():
                 print("❌ Environment validation failed")
                 print("Please check:")
@@ -131,45 +134,20 @@ Examples:
                 print("  - GEMINI_API_KEY is set in .env file")
                 print("  - FFmpeg is installed and accessible")
                 return 1
-            
-            # Process all files
             results = pipeline.process_all_files()
-            
-            # Print results summary
-            print("\n📊 Processing Results:")
-            print("-" * 30)
-            
-            successful = 0
+            successful = sum(1 for v in results.values() if v)
             total = len(results)
-            
-            for filename, success in results.items():
-                status = "✅ SUCCESS" if success else "❌ FAILED"
-                print(f"{filename}: {status}")
-                if success:
-                    successful += 1
-            
-            print("-" * 30)
-            print(f"Total files: {total}")
-            print(f"Successful: {successful}")
-            print(f"Failed: {total - successful}")
-            
-            if successful > 0:
-                print(f"\n📁 Results saved in: {args.output_dir}")
-                print("Files generated for each audio file:")
-                print("  - {audio_name}_converted.wav (converted audio)")
-                print("  - {audio_name}_transcription.txt (plain text transcription)")
-                print("  - {audio_name}_transcription_detailed.json (detailed transcription data)")
-                print("  - {audio_name}_api_response_YYYYMMDD_HHMMSS.json (Gemini API response)")
-                print("  - {audio_name}_api_response_YYYYMMDD_HHMMSS.txt (API response text)")
-                print("  - {audio_name}_pipeline_summary.json (execution summary)")
-                print("  - pipeline.log (detailed execution log)")
-            
+            # Only print summary if files were processed
+            if total > 0:
+                print(f"\n📊 Processing Results: {successful}/{total} successful")
+                if successful > 0:
+                    print(f"📁 Results saved in: {args.output_dir}")
             return 0 if successful == total else 1
-    
+
     except KeyboardInterrupt:
         print("\n⚠️  Pipeline interrupted by user")
         return 1
-    
+
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         print(f"❌ Unexpected error: {e}")

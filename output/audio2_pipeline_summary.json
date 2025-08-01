@@ -1,8 +1,8 @@
 {
   "pipeline_info": {
-    "start_time": "2025-08-01T12:27:40.138929",
-    "end_time": "2025-08-01T12:27:49.187101",
-    "duration_seconds": 9.048172950744629,
+    "start_time": "2025-08-01T18:36:42.135946",
+    "end_time": "2025-08-01T18:37:35.162974",
+    "duration_seconds": 53.02702784538269,
     "input_file": "audio2.mp3"
   },
   "step_results": {
@@ -18,7 +18,17 @@
     },
     "api_processing": {
       "status": "success",
-      "response_length": 4579
+      "response_length": 3856
+    },
+    "translation": {
+      "status": "success",
+      "original_length": 3856,
+      "translated_length": 4514
+    },
+    "tts": {
+      "status": "success",
+      "audio_file_path": "output\\audio2_20250801_183654.mp3",
+      "text_length": 4514
     }
   },
   "overall_status": "success"

@@ -9,12 +9,12 @@ Handles MP3 to WAV conversion with specific requirements:
 - Maintains audio quality during conversion
 """
 
-import os
 import logging
 from pathlib import Path
 from typing import Optional
 import ffmpeg
 from pydub import AudioSegment
+from constants import SAMPLE_RATE, CHANNELS, MAX_FILE_SIZE_MB, SUPPORTED_AUDIO_EXTENSIONS
 
 # Get logger for this module
 logger = logging.getLogger(__name__)
@@ -33,8 +33,8 @@ class AudioProcessor:
         """
         self.input_dir = Path(input_dir)
         self.output_dir = Path(output_dir)
-        self.sample_rate = 16000
-        self.channels = 1
+        self.sample_rate = SAMPLE_RATE
+        self.channels = CHANNELS
         
         # Output directory will be created by pipeline orchestrator
         
@@ -54,14 +54,14 @@ class AudioProcessor:
             logger.error(f"Audio file not found: {file_path}")
             return False
         
-        if not file_path.suffix.lower() == '.mp3':
-            logger.error(f"Unsupported audio format: {file_path.suffix}. Only MP3 files are supported.")
+        if not file_path.suffix.lower() in SUPPORTED_AUDIO_EXTENSIONS:
+            logger.error(f"Unsupported audio format: {file_path.suffix}. Only {SUPPORTED_AUDIO_EXTENSIONS} are supported.")
             return False
         
         # Check file size (max 50MB as per FR-001)
         file_size_mb = file_path.stat().st_size / (1024 * 1024)
-        if file_size_mb > 50:
-            logger.error(f"File size {file_size_mb:.2f}MB exceeds maximum limit of 50MB")
+        if file_size_mb > MAX_FILE_SIZE_MB:
+            logger.error(f"File size {file_size_mb:.2f}MB exceeds maximum limit of {MAX_FILE_SIZE_MB}MB")
             return False
         
         logger.info(f"Audio file validated: {file_path} ({file_size_mb:.2f}MB)")
@@ -177,4 +177,4 @@ class AudioProcessor:
         return audio_files
 
 
-# Test function removed - use main.py for testing 
+# Test function removed - use main.py for testing
