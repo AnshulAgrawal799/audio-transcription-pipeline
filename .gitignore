@@ -1,0 +1,36 @@
+# .gitignore
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.DS_Store
+*.sqlite3
+
+# VS Code settings
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# macOS system files (if you ever use macOS)
+.DS_Store
+
+# Windows system files
+Thumbs.db
+
+# Log files
+*.log
+
+# Test and coverage outputs
+htmlcov/
+.coverage
+.tox/
+.cache/
+pytest_cache/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

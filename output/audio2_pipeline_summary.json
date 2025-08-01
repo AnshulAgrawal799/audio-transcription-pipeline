@@ -1,0 +1,25 @@
+{
+  "pipeline_info": {
+    "start_time": "2025-08-01T12:27:40.138929",
+    "end_time": "2025-08-01T12:27:49.187101",
+    "duration_seconds": 9.048172950744629,
+    "input_file": "audio2.mp3"
+  },
+  "step_results": {
+    "audio_processing": {
+      "status": "success",
+      "output_path": "output\\audio2_converted.wav",
+      "input_file": "audio2.mp3"
+    },
+    "transcription": {
+      "status": "success",
+      "text_length": 310,
+      "confidence_score": -0.833068860185755
+    },
+    "api_processing": {
+      "status": "success",
+      "response_length": 4579
+    }
+  },
+  "overall_status": "success"
+}
