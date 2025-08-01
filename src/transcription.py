@@ -16,8 +16,7 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 import json
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Get logger for this module
 logger = logging.getLogger(__name__)
 
 
@@ -36,8 +35,7 @@ class TranscriptionEngine:
         self.output_dir = Path(output_dir)
         self.model = None
         
-        # Create output directory if it doesn't exist
-        self.output_dir.mkdir(exist_ok=True)
+        # Output directory will be created by pipeline orchestrator
         
         logger.info(f"Transcription engine initialized with model={model_name}, output_dir={output_dir}")
     
@@ -226,22 +224,4 @@ class TranscriptionEngine:
         return transcription_result
 
 
-def main():
-    """Test the transcription engine."""
-    engine = TranscriptionEngine()
-    
-    # Test with a sample audio file
-    test_audio = "output/audio2_converted.wav"  # Assuming this exists after audio processing
-    
-    if Path(test_audio).exists():
-        result = engine.process_audio_file(test_audio)
-        if result:
-            print(f"Transcription successful: {result['text'][:100]}...")
-        else:
-            print("Transcription failed")
-    else:
-        print(f"Test audio file not found: {test_audio}")
-
-
-if __name__ == "__main__":
-    main() 
+# Test function removed - use main.py for testing 

@@ -25,8 +25,7 @@ try:
 except:
     pass  # Continue without .env file
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Get logger for this module
 logger = logging.getLogger(__name__)
 
 
@@ -44,8 +43,7 @@ class GeminiAPIClient:
         self.api_url = os.getenv('GEMINI_API_URL', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent')
         self.output_dir = Path(output_dir)
         
-        # Create output directory if it doesn't exist
-        self.output_dir.mkdir(exist_ok=True)
+        # Output directory will be created by pipeline orchestrator
         
         # Rate limiting settings
         self.max_retries = 3
@@ -251,9 +249,6 @@ class GeminiAPIClient:
             logger.info(f"API response saved to: {output_path} and {txt_path}")
             return True
             
-            logger.info(f"API response saved to: {output_path}")
-            return True
-            
         except Exception as e:
             logger.error(f"Failed to save API response: {e}")
             return False
@@ -293,19 +288,4 @@ class GeminiAPIClient:
         return parsed_response
 
 
-def main():
-    """Test the Gemini API client."""
-    client = GeminiAPIClient()
-    
-    # Test with sample text
-    test_text = "This is a test transcription from Tamil audio."
-    
-    result = client.process_transcription(test_text)
-    if result:
-        print(f"API processing successful: {result['generated_text'][:100]}...")
-    else:
-        print("API processing failed")
-
-
-if __name__ == "__main__":
-    main()
+# Test function removed - use main.py for testing

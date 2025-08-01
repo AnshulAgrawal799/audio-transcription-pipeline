@@ -12,12 +12,11 @@ Handles MP3 to WAV conversion with specific requirements:
 import os
 import logging
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 import ffmpeg
 from pydub import AudioSegment
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Get logger for this module
 logger = logging.getLogger(__name__)
 
 
@@ -37,8 +36,7 @@ class AudioProcessor:
         self.sample_rate = 16000
         self.channels = 1
         
-        # Create output directory if it doesn't exist
-        self.output_dir.mkdir(exist_ok=True)
+        # Output directory will be created by pipeline orchestrator
         
         logger.info(f"Audio processor initialized with input_dir={input_dir}, output_dir={output_dir}")
     
@@ -179,24 +177,4 @@ class AudioProcessor:
         return audio_files
 
 
-def main():
-    """Test the audio processor."""
-    processor = AudioProcessor()
-    
-    # List available audio files
-    audio_files = processor.list_audio_files()
-    print(f"Available audio files: {audio_files}")
-    
-    # Process the first available file
-    if audio_files:
-        result = processor.process_audio_file(audio_files[0])
-        if result:
-            print(f"Successfully processed: {result}")
-        else:
-            print("Processing failed")
-    else:
-        print("No audio files found")
-
-
-if __name__ == "__main__":
-    main() 
+# Test function removed - use main.py for testing 

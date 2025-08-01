@@ -11,8 +11,9 @@ Coordinates all pipeline components with sequential processing:
 import os
 import logging
 import time
+import json
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from datetime import datetime
 
 from audio_processor import AudioProcessor
@@ -236,7 +237,6 @@ class AudioTranscriptionPipeline:
                 summary_filename = f"pipeline_summary_{timestamp}.json"
             
             summary_path = self.output_dir / summary_filename
-            import json
             with open(summary_path, 'w', encoding='utf-8') as f:
                 json.dump(summary, f, indent=2, ensure_ascii=False)
             
@@ -338,19 +338,4 @@ class AudioTranscriptionPipeline:
         return results
 
 
-def main():
-    """Main entry point for the pipeline."""
-    pipeline = AudioTranscriptionPipeline()
-    
-    # Process all files
-    results = pipeline.process_all_files()
-    
-    # Print results
-    print("\nPipeline Results:")
-    for filename, success in results.items():
-        status = "✓ SUCCESS" if success else "✗ FAILED"
-        print(f"{filename}: {status}")
-
-
-if __name__ == "__main__":
-    main() 
+# Test function removed - use main.py for testing 

@@ -111,7 +111,7 @@ AUDIO_CHANNELS=1
 ```
 
 ### API Configuration
-- **API Key**: `AIzaSyBwuBIcw_dtdNhXiXsERf3xJFl5ArBq6DA`
+- **API Key**: `Your_Gemini_API_Key_Here`
 - **Whisper Model**: `base`
 - **Audio Format**: WAV, 16kHz, Mono
 - **CPU Mode**: `fp16=False`

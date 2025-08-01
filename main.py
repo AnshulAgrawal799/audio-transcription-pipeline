@@ -12,14 +12,10 @@ import argparse
 import logging
 from pathlib import Path
 
-from dotenv import load_dotenv  # <-- Add this line
-
-load_dotenv()  # <-- And this line, right after imports
-
 # Add src directory to Python path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from src.pipeline import AudioTranscriptionPipeline
+from pipeline import AudioTranscriptionPipeline
 
 
 def setup_logging(verbose: bool = False):
