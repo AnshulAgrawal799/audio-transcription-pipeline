@@ -34,3 +34,9 @@ pytest_cache/
 build/
 dist/
 *.egg-info/
+
+audio/
+# Ignore audio files
+
+output/
+# Ignore output directories
